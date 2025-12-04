@@ -1,0 +1,33 @@
+# --- DEPENDENCIAS (Basura pesada) ---
+node_modules/
+*/node_modules/
+
+# --- ARCHIVOS DE ENTORNO (Secretos - ¡PELIGRO!) ---
+.env
+.env.*
+*/.env
+*/.env.*
+
+# --- BUILDS (Archivos compilados) ---
+dist/
+*/dist/
+.next/
+*/.next/
+build/
+*/build/
+
+# --- LOGS Y SISTEMA ---
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db
+
+# --- IDEs ---
+.vscode/
+.idea/
+*.swp
+
+# --- DOCKER ---
+# Si mapeaste datos locales (por seguridad)
+postgres_data/

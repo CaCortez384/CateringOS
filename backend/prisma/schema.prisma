@@ -1,0 +1,79 @@
+// backend/prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 1. El Admin 
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+}
+
+// 2. Los Clientes (La gente que pide los asados)
+model Client {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String?  // Opcional, a veces solo es por IG
+  phone     String?
+  events    Event[]  // Un cliente puede tener varios eventos en el tiempo
+}
+
+// 3. El Evento (El centro de todo)
+model Event {
+  id          Int      @id @default(autoincrement())
+  name        String   // Ej: "Cumpleaños Juan"
+  date        DateTime // Fecha del evento
+  guests      Int      // Cantidad de personas (pax)
+  address     String?
+  status      String   @default("DRAFT") // DRAFT, SENT, BOOKED, COMPLETED, CANCELLED
+  totalPrice  Float    @default(0)
+  
+  clientId    Int
+  client      Client   @relation(fields: [clientId], references: [id])
+  
+  menuId      Int?
+  menu        Menu?    @relation(fields: [menuId], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 4. El Menú Base (Lo que vende: "Pack Premium", "Pack Económico")
+model Menu {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  basePrice   Float    // Precio base por persona sugerido
+  items       MenuItem[] // Relación con los ingredientes
+  events      Event[]
+}
+
+// 5. Los Insumos (Carne, Carbón, Pan)
+model Item {
+  id          Int      @id @default(autoincrement())
+  name        String   // Ej: "Lomo Vetado"
+  unit        String   // Ej: "kg", "unidad", "bolsa"
+  cost        Float    // Costo actual de compra por unidad
+  menus       MenuItem[]
+}
+
+// 6. La Receta (Tabla Intermedia: Cuánto de qué lleva cada menú)
+model MenuItem {
+  id        Int   @id @default(autoincrement())
+  menuId    Int
+  menu      Menu  @relation(fields: [menuId], references: [id])
+  
+  itemId    Int
+  item      Item  @relation(fields: [itemId], references: [id])
+  
+  quantity  Float // Ej: 0.35 (significa 350gr por persona)
+}
