@@ -17,6 +17,13 @@ export class EventsController {
     return this.eventsService.findAll();
   }
 
+  // --- NUEVO: Buscar por UUID (El secreto del link) ---
+  @Get('uuid/:uuid')
+  findOneByUuid(@Param('uuid') uuid: string) {
+    return this.eventsService.findOneByUuid(uuid);
+  }
+  // ----------------------------------------------------
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.eventsService.findOne(+id);

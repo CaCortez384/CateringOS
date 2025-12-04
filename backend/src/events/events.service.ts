@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
-import { PrismaService } from 'src/prisma/prisma.service'; // <--- No olvides importar esto
+import { UpdateEventDto } from './dto/update-event.dto'; // Asegúrate de importar esto
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class EventsService {
@@ -8,32 +9,62 @@ export class EventsService {
 
   async create(createEventDto: CreateEventDto) {
     const { clientId, date, ...data } = createEventDto;
-
     return await this.prisma.event.create({
       data: {
         ...data,
-        date: new Date(date), // Convertimos el string de JSON a objeto Date real
-        // AQUÍ OCURRE LA MAGIA RELACIONAL:
-        client: {
-          connect: { id: clientId }, 
-        },
+        date: new Date(date),
+        client: { connect: { id: clientId } },
       },
-      // Esto le dice a Prisma: "Devuélveme el evento CREADO, pero incluye los datos del cliente también"
-      include: {
-        client: true, 
-      }
-    });
-  }
-
-  // Completa el findAll para ver los datos anidados después
-  async findAll() {
-    return await this.prisma.event.findMany({
       include: { client: true },
     });
   }
-  
-  // ... deja el resto como está por ahora
-  findOne(id: number) { return `This action returns a #${id} event`; }
-  update(id: number, updateEventDto: any) { return `This action updates a #${id} event`; }
-  remove(id: number) { return `This action removes a #${id} event`; }
+
+  async findAll() {
+    return await this.prisma.event.findMany({
+      // AGREGAMOS "menu: true" AQUÍ:
+      include: {
+        client: true,
+        menu: true,
+      },
+      orderBy: { date: 'asc' },
+    });
+  }
+
+  // --- NUEVO: Búsqueda Real por UUID ---
+  async findOneByUuid(uuid: string) {
+    const event = await this.prisma.event.findUnique({
+      where: { uuid },
+      include: { client: true, menu: true }, // Traemos todo
+    });
+    if (!event) throw new NotFoundException(`Evento no encontrado`);
+    return event;
+  }
+
+  // --- CORRECCIÓN: Update Real ---
+  async update(id: number, updateEventDto: UpdateEventDto) {
+    // Extraemos datos especiales si vienen en el DTO
+    const { clientId, menuId, date, ...rest } = updateEventDto as any;
+
+    const dataToUpdate: any = { ...rest };
+
+    // Si viene fecha, la convertimos
+    if (date) dataToUpdate.date = new Date(date);
+
+    // Si viene menuId, conectamos la relación
+    if (menuId) dataToUpdate.menu = { connect: { id: Number(menuId) } };
+
+    return await this.prisma.event.update({
+      where: { id },
+      data: dataToUpdate,
+      include: { menu: true },
+    });
+  }
+
+  // Dejamos los demás como stubs por ahora si quieres
+  findOne(id: number) {
+    return `This action returns a #${id} event`;
+  }
+  remove(id: number) {
+    return `This action removes a #${id} event`;
+  }
 }
