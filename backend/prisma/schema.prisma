@@ -30,11 +30,15 @@ model Client {
 // 3. El Evento (El centro de todo)
 model Event {
   id          Int      @id @default(autoincrement())
-  name        String   // Ej: "Cumpleaños Juan"
-  date        DateTime // Fecha del evento
-  guests      Int      // Cantidad de personas (pax)
+  
+  // AGREGA ESTA LÍNEA AQUÍ:
+  uuid        String   @unique @default(uuid()) 
+  
+  name        String   
+  date        DateTime 
+  guests      Int      
   address     String?
-  status      String   @default("DRAFT") // DRAFT, SENT, BOOKED, COMPLETED, CANCELLED
+  status      String   @default("DRAFT") 
   totalPrice  Float    @default(0)
   
   clientId    Int
