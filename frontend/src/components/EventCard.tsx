@@ -1,32 +1,22 @@
 // frontend/src/components/EventCard.tsx
-'use client'; // <--- Esto habilita la interactividad
+'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import EditEventForm from './EditEventForm'; // <--- 1. IMPORTAR
 
 export default function EventCard({ event }: { event: any }) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Función para borrar el evento
   const handleDelete = async () => {
-    // 1. Confirmación de seguridad
     if (!confirm('¿Estás SEGURO de eliminar este evento? No se puede deshacer.')) return;
-
     setIsDeleting(true);
-
     try {
-      // 2. Llamada al Backend
-      const res = await fetch(`http://localhost:4000/events/${event.id}`, {
-        method: 'DELETE',
-      });
-
+      const res = await fetch(`http://localhost:4000/events/${event.id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Error al eliminar');
-
-      // 3. Recargar la página para ver el cambio
       router.refresh(); 
-      
     } catch (error) {
       alert('Hubo un problema al intentar borrar.');
       setIsDeleting(false);
@@ -69,9 +59,8 @@ export default function EventCard({ event }: { event: any }) {
           )}
         </div>
 
-        {/* ACCIONES (Botones) */}
+        {/* ACCIONES */}
         <div className="flex items-center gap-3 w-full md:w-auto">
-          {/* Botón Ver Link */}
           <Link 
             href={`/quote/${event.uuid}`} 
             target="_blank"
@@ -80,7 +69,9 @@ export default function EventCard({ event }: { event: any }) {
             🔗 Link
           </Link>
 
-          {/* Botón Eliminar (NUEVO) */}
+          {/* 2. AGREGAMOS EL EDITAR AQUÍ */}
+          <EditEventForm event={event} />
+
           <button 
             onClick={handleDelete}
             className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-900/20 rounded-lg transition"

@@ -41,22 +41,25 @@ export class EventsService {
   }
 
   // --- CORRECCIÓN: Update Real ---
-  async update(id: number, updateEventDto: UpdateEventDto) {
-    // Extraemos datos especiales si vienen en el DTO
-    const { clientId, menuId, date, ...rest } = updateEventDto as any;
+  async update(id: number, updateEventDto: any) {
+    // Usamos 'any' para facilitar la manipulación manual
+    const { clientId, menuId, date, ...rest } = updateEventDto;
 
     const dataToUpdate: any = { ...rest };
 
-    // Si viene fecha, la convertimos
+    // Si viene fecha, la convertimos a objeto Date
     if (date) dataToUpdate.date = new Date(date);
 
     // Si viene menuId, conectamos la relación
     if (menuId) dataToUpdate.menu = { connect: { id: Number(menuId) } };
 
+    // Si cambiamos de cliente (¡Crucial!)
+    if (clientId) dataToUpdate.client = { connect: { id: Number(clientId) } };
+
     return await this.prisma.event.update({
       where: { id },
       data: dataToUpdate,
-      include: { menu: true },
+      include: { menu: true, client: true },
     });
   }
 
