@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { API_URL } from '@/config'; // <--- Importar arriba
 
 export default function CreateEventForm() {
   const router = useRouter();
@@ -31,7 +32,7 @@ export default function CreateEventForm() {
   // Cargar clientes al abrir el modal
   useEffect(() => {
     if (isOpen) {
-      fetch('http://localhost:4000/clients')
+      fetch(`${API_URL}/clients`)
         .then(res => res.json())
         .then(data => setExistingClients(data))
         .catch(err => console.error("Error cargando clientes:", err));
@@ -47,7 +48,7 @@ export default function CreateEventForm() {
 
       // PASO 1: Si es cliente nuevo, lo creamos primero
       if (isNewClient) {
-        const resClient = await fetch('http://localhost:4000/clients', {
+        const resClient = await fetch(`${API_URL}/clients`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -71,7 +72,7 @@ export default function CreateEventForm() {
       }
 
       // PASO 2: Creamos el evento asociado a ese ID (viejo o nuevo)
-      const resEvent = await fetch('http://localhost:4000/events', {
+      const resEvent = await fetch(`${API_URL}/events`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

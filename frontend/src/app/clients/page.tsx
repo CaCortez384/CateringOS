@@ -1,10 +1,11 @@
 // frontend/src/app/clients/page.tsx
 import Link from 'next/link';
 import ClientRow from '@/components/ClientRow'; // <--- IMPORTAR
+import { API_URL } from '@/config'; // <--- Importar arriba
 
 async function getClients() {
   // Recordar: nuestro backend incluye los eventos en el findAll de clients
-  const res = await fetch('http://localhost:4000/clients', { cache: 'no-store' });
+  const res = await fetch(`${API_URL}/clients`, { cache: 'no-store' });
   if (!res.ok) throw new Error('Error cargando clientes');
   return res.json();
 }

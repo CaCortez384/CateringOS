@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { API_URL } from '@/config'; // <--- Importar arriba
 
 export default function EditEventForm({ event }: { event: any }) {
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function EditEventForm({ event }: { event: any }) {
   // Cargar clientes al abrir el modal (para poder cambiarlo si queremos)
   useEffect(() => {
     if (isOpen) {
-      fetch('http://localhost:4000/clients')
+      fetch(`${API_URL}/clients`)
         .then(res => res.json())
         .then(data => setClients(data))
         .catch(err => console.error("Error cargando clientes:", err));
@@ -33,7 +34,7 @@ export default function EditEventForm({ event }: { event: any }) {
     setIsLoading(true);
 
     try {
-      const res = await fetch(`http://localhost:4000/events/${event.id}`, {
+      const res = await fetch(`${API_URL}/events/${event.id}`, {
         method: 'PATCH', // <--- Importante: PATCH para actualizar
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

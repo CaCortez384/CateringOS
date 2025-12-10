@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import EditClientForm from './EditClientForm';
+import { API_URL } from '@/config'; // Importar la URL base de la API
 
 export default function ClientRow({ client }: { client: any }) {
   const router = useRouter();
@@ -20,7 +21,7 @@ export default function ClientRow({ client }: { client: any }) {
 
     setIsDeleting(true);
     try {
-      const res = await fetch(`http://localhost:4000/clients/${client.id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_URL}/clients/${client.id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Error al eliminar');
       router.refresh(); 
     } catch (error) {

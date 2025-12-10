@@ -1,9 +1,10 @@
 // frontend/src/app/page.tsx
 import CreateEventForm from '@/components/CreateEventForm';
 import EventCard from '@/components/EventCard'; // <--- Importamos el componente
+import { API_URL } from '@/config'; // <--- Importar arriba
 
 async function getEvents() {
-  const res = await fetch('http://localhost:4000/events', { cache: 'no-store' });
+  const res = await fetch(`${API_URL}/events`, { cache: 'no-store' });
   if (!res.ok) throw new Error('Failed to fetch events');
   return res.json();
 }

@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { API_URL } from '@/config'; // <--- Importar arriba
 
 export default function EditClientForm({ client }: { client: any }) {
   const router = useRouter();
@@ -20,7 +21,7 @@ export default function EditClientForm({ client }: { client: any }) {
     setIsLoading(true);
 
     try {
-      const res = await fetch(`http://localhost:4000/clients/${client.id}`, {
+      const res = await fetch(`${API_URL}/clients/${client.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
