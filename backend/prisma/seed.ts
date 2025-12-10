@@ -1,5 +1,6 @@
 // backend/prisma/seed.ts
 import { PrismaClient } from '@prisma/client';
+import * as bcrypt from 'bcrypt'; // <--- ¡AGREGA ESTA LÍNEA AQUÍ ARRIBA!
 
 const prisma = new PrismaClient();
 
@@ -50,6 +51,19 @@ async function main() {
       description: 'La experiencia definitiva con buffet americano completo.',
     },
   });
+
+  // 0. Crear el Usuario Admin
+  const password = await bcrypt.hash('admin123', 10); // Contraseña inicial: admin123
+  const admin = await prisma.user.upsert({
+    where: { email: 'admin@sociosdelfuego.cl' },
+    update: {}, // Si existe, no hacemos nada
+    create: {
+      email: 'admin@sociosdelfuego.cl',
+      name: 'Admin Socios',
+      password: password,
+    },
+  });
+  console.log(`👤 Admin creado: ${admin.email}`);
 
   console.log('✅ Menús actualizados:');
   console.log(`1. ${menu1.name} ($${menu1.basePrice})`);
