@@ -60,11 +60,20 @@ export class EventsService {
     });
   }
 
+  async remove(id: number) {
+    // Primero verificamos si existe (opcional, pero buena práctica)
+    try {
+      return await this.prisma.event.delete({
+        where: { id },
+      });
+    } catch (error) {
+      // Si falla (ej: no existe), lanzamos un error que Nest entienda
+      throw new Error(`No se pudo eliminar el evento #${id}`);
+    }
+  }
+
   // Dejamos los demás como stubs por ahora si quieres
   findOne(id: number) {
     return `This action returns a #${id} event`;
-  }
-  remove(id: number) {
-    return `This action removes a #${id} event`;
   }
 }
