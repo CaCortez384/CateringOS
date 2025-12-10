@@ -27,12 +27,26 @@ export class ClientsService {
     });
   }
 
-  // Por ahora dejaremos update y remove pendientes para no complicarnos
-  update(id: number, updateClientDto: any) {
-    return `This action updates a #${id} client`;
+  async update(id: number, updateClientDto: any) {
+    return await this.prisma.client.update({
+      where: { id },
+      data: updateClientDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} client`;
+  // CAMBIO 2: Remove Real
+  async remove(id: number) {
+    // Opcional: Podrías validar si tiene eventos antes de borrar para no romper nada,
+    // pero por ahora dejaremos que Prisma lance error si hay restricción de clave foránea,
+    // o borraremos en cascada según tengas configurado el Schema.
+    try {
+      return await this.prisma.client.delete({
+        where: { id },
+      });
+    } catch (error) {
+      throw new Error(
+        `No se pudo eliminar el cliente #${id} (¿Tiene eventos asociados?)`,
+      );
+    }
   }
 }
